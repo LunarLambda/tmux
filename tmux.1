@@ -6957,6 +6957,11 @@ Display a popup running
 .Ar default-command
 when omitted) on
 .Ar target-client .
+Before being executed,
+.Ar shell-command
+is expanded using the rules specified in the
+.Sx FORMATS
+section.
 A popup is a rectangular box drawn over the top of any panes.
 Panes are not updated while a popup is present.
 .Pp

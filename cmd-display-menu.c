@@ -454,11 +454,14 @@ cmd_display_popup_exec(struct cmd *self, struct cmdq_item *item)
 		cwd = format_single_from_target(item, value);
 	else
 		cwd = xstrdup(server_client_get_cwd(tc, s));
-	if (count == 0)
+	if (count == 0) {
 		shellcmd = options_get_string(s->options, "default-command");
+		shellcmd = xstrdup(shellcmd ? shellcmd : "");
+	}
 	else if (count == 1)
-		shellcmd = args_string(args, 0);
-	if (count <= 1 && (shellcmd == NULL || *shellcmd == '\0')) {
+		shellcmd = format_single_from_target(item, args_string(args, 0));
+	if (count <= 1 && *shellcmd == '\0') {
+		free(shellcmd);
 		shellcmd = NULL;
 		shell = options_get_string(s->options, "default-shell");
 		if (!checkshell(shell))
@@ -490,12 +493,16 @@ cmd_display_popup_exec(struct cmd *self, struct cmdq_item *item)
 		if (env != NULL)
 			environ_free(env);
 		free(cwd);
+		if (shellcmd != NULL)
+			free(shellcmd);
 		free(title);
 		return (CMD_RETURN_NORMAL);
 	}
 	if (env != NULL)
 		environ_free(env);
 	free(cwd);
+	if (shellcmd != NULL)
+		free(shellcmd);
 	free(title);
 	cmd_free_argv(argc, argv);
 	return (CMD_RETURN_WAIT);
